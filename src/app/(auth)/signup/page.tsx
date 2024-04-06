@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 
 import "remixicon/fonts/remixicon.css";
+import { useRouter } from "next/navigation";
 
 const SignupPage = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +36,8 @@ const SignupPage = () => {
   const [createUserWithEmailAndPassword] =
     useCreateUserWithEmailAndPassword(auth);
 
+  const router = useRouter();
+
   const handleSubmit = async () => {
     // e.preventDefault();
     // Add your signup logic here
@@ -43,6 +46,7 @@ const SignupPage = () => {
       console.log(res);
       setEmail("");
       setPassword("");
+      router.push("/signin");
     } catch (error) {
       console.error(error);
     }
@@ -55,7 +59,7 @@ const SignupPage = () => {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
           <CardDescription>
-            Enter your email and password to create to your account
+            Enter your email and password to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>

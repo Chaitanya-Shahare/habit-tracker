@@ -1,19 +1,37 @@
-import { ModeToggle } from "./mode-toggle";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
-
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import "remixicon/fonts/remixicon.css";
+import { auth } from "@/app/firebase/config";
 
-export default function Header() {
-  const a = "a";
+export default function Header({
+  title,
+  isBackButton = false,
+}: {
+  title?: string;
+  isBackButton?: boolean;
+}) {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
   return (
     <header className="border-b-2 p-4 flex justify-between items-center">
-      <h1 className="text-2xl font-bold">Habit Tracker</h1>
+      <div className="flex items-center gap-1">
+        {isBackButton && (
+          <Button
+            variant={"ghost"}
+            onClick={() => {
+              router.push("/");
+            }}
+          >
+            <i className="ri-arrow-left-line ri-xl"></i>
+            <span className="sr-only">Back to home</span>
+          </Button>
+        )}
+        <h2 className="text-xl font-bold">{title ? title : "Habit Tracker"}</h2>
+      </div>
       <div className="flex justify-center gap-4">
-        {/* <ModeToggle /> */}
         <Button
           variant={"ghost"}
           onClick={() => {
@@ -26,7 +44,9 @@ export default function Header() {
           <span className="sr-only">Toggle theme</span>
         </Button>
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage
+            src={auth.currentUser?.photoURL || "https://github.com/shadcn.png"}
+          />
           <AvatarFallback>CS</AvatarFallback>
         </Avatar>
       </div>

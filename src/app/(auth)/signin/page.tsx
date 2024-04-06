@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import {
+  useSignInWithEmailAndPassword,
+  useSignInWithGoogle,
+} from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import {
@@ -49,6 +52,17 @@ const SignInPage = () => {
     }
   };
 
+  const [signInWithGoogle] = useSignInWithGoogle(auth);
+
+  const handleGoogleSignIn = async () => {
+    const res = await signInWithGoogle();
+    console.log(res);
+    if (res) {
+      localStorage.setItem("user", JSON.stringify(res.user));
+      router.push("/");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col gap-24">
       <Header />
@@ -90,7 +104,11 @@ const SignInPage = () => {
           <div className="text-center mt-4 text-muted-foreground">OR</div>
 
           <div className="mt-4">
-            <Button className="w-full" variant="outline">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={handleGoogleSignIn}
+            >
               <i className="ri-google-fill mr-2 ri-xl"></i>
               Sign In with Google
             </Button>

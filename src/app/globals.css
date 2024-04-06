@@ -57,3 +57,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.react-calendar-heatmap text {
+  color: var(--muted-foreground);
+  font-size: 0.15rem;
+}
