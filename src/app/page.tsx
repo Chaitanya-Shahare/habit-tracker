@@ -1,6 +1,4 @@
 "use client";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollection } from "react-firebase-hooks/firestore";
 import { auth, db } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -19,12 +17,32 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  setDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { nanoid } from "nanoid";
+
+export interface IHabit {
+  name: string;
+  status: { date: string }[];
+  id: string;
+  goalPerWeek?: number;
+}
 
 export default function Home() {
-  const [user] = useAuthState(auth);
-
   const router = useRouter();
+
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      router.replace("/signin");
+    }
+  }, [router]);
 
   // Get the last 5 days
   const last5Days = Array.from({ length: 5 }, (_, i) => {
@@ -32,30 +50,23 @@ export default function Home() {
     d.setDate(d.getDate() - i);
     const day = d.getDay();
     const date = d.getDate().toString().padStart(2, "0"); // format to 'dd'
+    const month = (d.getMonth() + 1).toString().padStart(2, "0"); // format to 'mm'
+    const year = d.getFullYear();
+    const formattedDate = `${year}-${month}-${date}`;
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return { day: days[day], date };
+    return { day: days[day], date: date, dateString: formattedDate };
   });
 
-  const [habits, setHabits] = useState([
+  const [habits, setHabits] = useState<IHabit[]>([
     // {
+    //   id: "1",
     //   name: "Play guitar",
-    //   status: [true, false, true, false, true],
+    //   status: [{ date: "2024-04-05" }, { date: "2024-04-03" }],
     // },
     // {
+    //   id: "2",
     //   name: "Read a book",
-    //   status: [false, false, false, true, true],
-    // },
-    // {
-    //   name: "Exercise",
-    //   status: [true, false, true, false, true],
-    // },
-    // {
-    //   name: "Meditate",
-    //   status: [false, false, false, true, true],
-    // },
-    // {
-    //   name: "Write",
-    //   status: [true, false, true, false, true],
+    //   status: [],
     // },
   ]);
 
@@ -67,15 +78,16 @@ export default function Home() {
     status: Array.from({ length: 5 }, () => false),
   });
 
-  const addHabitToFirestore = async () => {
+  const addHabitToFirestore = async (uniqueId: string) => {
     try {
-      const docRef = await addDoc(collection(db, "habit"), {
+      const docRef = await setDoc(doc(db, "habit", uniqueId), {
         userEmail: auth.currentUser?.email,
         name: newHabit.name,
         goalPerWeek: goal,
-        status: [false, false, false, false, false],
+        status: [],
       });
-      console.log("Document written with ID: ", docRef.id);
+      console.log("Document written with ID: ", docRef);
+      return docRef;
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -84,38 +96,65 @@ export default function Home() {
   const handleAddHabit = async () => {
     console.log("handleAddHabit");
     const newHabits = [...habits];
+    const uniqueId = nanoid();
     newHabits.push({
       name: newHabit.name,
-      status: Array.from({ length: 5 }, () => false),
+      status: [],
+      id: uniqueId,
     });
     setHabits(newHabits);
     setIsAddHabitModalOpen(false);
-    await addHabitToFirestore();
+    await addHabitToFirestore(uniqueId);
     getHabits();
   };
 
   const getHabits = async () => {
-    // const userEmail = auth.currentUser?.email;
     const userEmail = localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user")!).email
       : auth.currentUser?.email;
     const q = query(
       collection(db, "habit"),
       where("userEmail", "==", userEmail)
+      // orderBy("name", "desc") // Add this line
     );
     const querySnapshot = await getDocs(q);
-    const docs = querySnapshot.docs.map((doc) => doc.data());
-    // console.log(docs);
+    const docs = querySnapshot.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id };
+    });
     return docs;
   };
 
+  const updateHabitInFirestore = async (id: string, habit: IHabit) => {
+    try {
+      const docRef = doc(db, "habit", id);
+      updateDoc(docRef, {
+        status: habit.status,
+      })
+        .then((docRef) => {
+          console.log(
+            "A New Document Field has been added to an existing document",
+            docRef
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      return docRef;
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  // TODO: uncomment this
   useEffect(() => {
-    getHabits().then((data) => {
-      setHabits(data);
-      console.log(data);
-    });
-    console.log(habits);
-  }, []);
+    if (localStorage.getItem("user")) {
+      getHabits().then((data: any) => {
+        setHabits(data);
+        console.log(data);
+      });
+      console.log(habits);
+    }
+  }, [habits]);
 
   return (
     <>
@@ -191,14 +230,14 @@ export default function Home() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Header />
+      <Header isAvatar={true} />
       <main className="flex justify-between p-4">
         <table className="w-full max-w-md">
           <thead>
             <tr>
               <th className="w-1/2"></th>
               {last5Days.map((day, index) => (
-                <th key={index} className="text-muted-foreground">
+                <th key={index} className="text-muted-foreground min-w-10">
                   {day.day} {day.date}
                 </th>
               ))}
@@ -208,22 +247,42 @@ export default function Home() {
             {habits.map((habit, index) => (
               <tr key={index} className="border-b-2 h-[60px]">
                 <td className="text-md">
-                  <Link href={`/habit/${habit.name}`}>{habit.name}</Link>
+                  <Link href={`/habit/${habit.id}`}>{habit.name}</Link>
                 </td>
-                {habit.status.map((_, i) => {
+                {last5Days.map((dayObj, i) => {
+                  const dateExists = habit.status.some(
+                    (statusObj) => statusObj.date === dayObj.dateString
+                  );
                   return (
                     <td key={i}>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => {
+                        onClick={async () => {
                           const newHabits = [...habits];
-                          newHabits[index].status[i] =
-                            !newHabits[index].status[i];
+                          if (dateExists) {
+                            newHabits[index].status = newHabits[
+                              index
+                            ].status.filter(
+                              (statusObj) =>
+                                statusObj.date !== dayObj.dateString
+                            );
+
+                            console.log(newHabits[index]);
+                          } else {
+                            newHabits[index].status.push({
+                              date: dayObj.dateString,
+                            });
+                          }
+                          console.log("newHabits[index]", newHabits[index]);
+                          await updateHabitInFirestore(
+                            newHabits[index].id,
+                            newHabits[index]
+                          );
                           setHabits(newHabits);
                         }}
                       >
-                        {habit.status[i] ? (
+                        {dateExists ? (
                           <i className="ri-check-fill ri-xl text-success"></i>
                         ) : (
                           <i className="ri-close-fill  text-error"></i>

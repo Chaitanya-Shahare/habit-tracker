@@ -1,7 +1,14 @@
 "use client";
-import Header from "@/components/header";
+import { useRouter } from "next/navigation";
+import { useLayoutEffect } from "react";
 
 export default function HabitPage() {
+  const router = useRouter();
+
+  useLayoutEffect(() => {
+    router.push("/");
+  }, [router]);
+
   return (
     <div>
       {/* <Header title="" /> */}

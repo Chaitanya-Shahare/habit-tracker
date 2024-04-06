@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
-import { set } from "firebase/database";
 
 import {
   CardTitle,
@@ -20,6 +19,14 @@ import "remixicon/fonts/remixicon.css";
 import { useRouter } from "next/navigation";
 
 const SignupPage = () => {
+  const router = useRouter();
+
+  useLayoutEffect(() => {
+    if (auth.currentUser) {
+      router.replace("/");
+    }
+  }, [router]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -35,8 +42,6 @@ const SignupPage = () => {
 
   const [createUserWithEmailAndPassword] =
     useCreateUserWithEmailAndPassword(auth);
-
-  const router = useRouter();
 
   const handleSubmit = async () => {
     // e.preventDefault();

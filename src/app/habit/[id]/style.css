@@ -1,0 +1,15 @@
+.react-calendar-heatmap .color-filled {
+  fill: black;
+}
+
+.react-calendar-heatmap .color-empty {
+  fill: hsl(var(--muted));
+}
+
+.dark .react-calendar-heatmap .color-filled {
+  fill: hsl(var(--accent-foreground));
+}
+
+.dark .react-calendar-heatmap .color-empty {
+  fill: hsl(var(--muted));
+}

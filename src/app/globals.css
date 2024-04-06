@@ -58,7 +58,30 @@
   }
 }
 
-.react-calendar-heatmap text {
-  color: var(--muted-foreground);
+.react-calendar-heatmap {
+  fill: hsl(var(--muted-foreground));
+  fill: red;
   font-size: 0.15rem;
 }
+
+/* .react-calendar-heatmap .color-filled { */
+/*   fill: var(--text-foreground); */
+/* } */
+/* .react-calendar-heatmap .color-empty { */
+/*   fill: var(--muted-foreground); */
+/* } */
+
+/* .dark .react-calendar-heatmap .color-filled { */
+/*   fill: var(--text-foreground); */
+/* } */
+/* .dark .react-calendar-heatmap .color-empty { */
+/*   fill: var(--muted-foreground); */
+/* } */
+
+/* .react-calendar-heatmap .color-filled { */
+/*   fill: red; */
+/* } */
+
+/* react-calendar-heatmap-month-labels { */
+/*   color: var(--muted-foreground); */
+/* } */

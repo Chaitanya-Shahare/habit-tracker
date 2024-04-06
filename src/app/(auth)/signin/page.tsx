@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect,  useState } from "react";
 import {
   useSignInWithEmailAndPassword,
   useSignInWithGoogle,
@@ -21,6 +21,14 @@ import Header from "@/components/header";
 import "remixicon/fonts/remixicon.css";
 
 const SignInPage = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem("user") || auth.currentUser) {
+      router.replace("/");
+    }
+  }, [router]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -33,8 +41,6 @@ const SignInPage = () => {
   };
 
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
-
-  const router = useRouter();
 
   const handleSubmit = async () => {
     // Add your signup logic here

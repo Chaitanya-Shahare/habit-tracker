@@ -27,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={inter.className + " max-w-md mx-auto min-h-screen relative"}
+      >
         {" "}
         <ThemeProvider
           attribute="class"
