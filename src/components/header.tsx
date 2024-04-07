@@ -37,7 +37,7 @@ export default function Header({
   const handleSignOut = async () => {
     await signOut(auth);
     router.push("/signin");
-		localStorage.removeItem("user");
+    localStorage.removeItem("user");
   };
   return (
     <>

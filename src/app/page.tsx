@@ -154,7 +154,7 @@ export default function Home() {
       });
       console.log(habits);
     }
-  }, [habits]);
+  }, []);
 
   return (
     <>

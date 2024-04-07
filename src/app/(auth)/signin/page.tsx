@@ -1,8 +1,9 @@
 "use client";
-import React, { useEffect,  useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useSignInWithEmailAndPassword,
   useSignInWithGoogle,
+  useSignInWithGithub,
 } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
@@ -19,15 +20,16 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 
 import "remixicon/fonts/remixicon.css";
+import Link from "next/link";
 
 const SignInPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (localStorage.getItem("user") || auth.currentUser) {
+    if (localStorage.getItem("user")) {
       router.replace("/");
     }
-  }, [router]);
+  }, []);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,6 +53,7 @@ const SignInPage = () => {
       setEmail("");
       setPassword("");
       if (res) {
+        localStorage.setItem("user", JSON.stringify(res.user));
         router.push("/");
       }
     } catch (error) {
@@ -59,9 +62,11 @@ const SignInPage = () => {
   };
 
   const [signInWithGoogle] = useSignInWithGoogle(auth);
+  const [signInWithGithub] = useSignInWithGithub(auth);
 
   const handleGoogleSignIn = async () => {
     const res = await signInWithGoogle();
+    // const res = await signInWithGithub();
     console.log(res);
     if (res) {
       localStorage.setItem("user", JSON.stringify(res.user));
@@ -119,6 +124,7 @@ const SignInPage = () => {
               Sign In with Google
             </Button>
           </div>
+          <Link href="/signup"> Signup</Link>
         </CardContent>
       </Card>
     </div>

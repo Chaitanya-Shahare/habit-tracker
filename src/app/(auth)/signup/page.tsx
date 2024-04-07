@@ -14,9 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
-
-import "remixicon/fonts/remixicon.css";
 import { useRouter } from "next/navigation";
+import "remixicon/fonts/remixicon.css";
+import Link from "next/link";
 
 const SignupPage = () => {
   const router = useRouter();
@@ -44,11 +44,10 @@ const SignupPage = () => {
     useCreateUserWithEmailAndPassword(auth);
 
   const handleSubmit = async () => {
-    // e.preventDefault();
-    // Add your signup logic here
     try {
+      console.log("before res in handlesubmit in signup page.tsx");
       const res = await createUserWithEmailAndPassword(email, password);
-      console.log(res);
+      console.log("res in handlesubmit in signup page.tsx", res);
       setEmail("");
       setPassword("");
       router.push("/signin");
@@ -109,6 +108,8 @@ const SignupPage = () => {
               Sign Up with Google
             </Button>
           </div>
+
+          <Link href="/signin"> Sign In</Link>
         </CardContent>
       </Card>
     </div>
