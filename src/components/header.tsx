@@ -44,7 +44,7 @@ export default function Header({
     localStorage.removeItem("user");
   };
 
-  const user = JSON.parse(localStorage.getItem("user")!);
+  // const user = JSON.parse(localStorage.getItem("user")!);
 
   return (
     <>
@@ -88,10 +88,16 @@ export default function Header({
               {/* <Button variant="outline">Open</Button> */}
               {isAvatar && (
                 <Avatar>
-                  <AvatarImage src={auth.currentUser?.photoURL || ""} />
-                  <AvatarFallback>
-                    {user.email.split("")[0].toUpperCase()}
-                  </AvatarFallback>
+                  <AvatarImage
+                    src={
+                      auth.currentUser?.photoURL ||
+                      "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+                    }
+                  />
+                  {/* TODO: uncomment below line */}
+                  {/* <AvatarFallback> */}
+                  {/*   {user.email.split("")[0].toUpperCase()} */}
+                  {/* </AvatarFallback> */}
                 </Avatar>
               )}
             </DropdownMenuTrigger>
