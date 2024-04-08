@@ -3,65 +3,24 @@ import Header from "@/components/header";
 import "react-calendar-heatmap/dist/styles.css";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "./style.css";
-
-import { doc, getDoc } from "firebase/firestore";
-
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { Bar, BarChart, ResponsiveContainer, XAxis } from "recharts";
 import { auth, db } from "@/app/firebase/config";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { IHabit } from "@/app/page";
 import { redirect } from "next/navigation";
-
-// const data = [
-//   {
-//     month: "Apr",
-//     times: 20,
-//   },
-//   {
-//     month: "Mar",
-//     times: 15,
-//   },
-//   {
-//     month: "Feb",
-//     times: 10,
-//   },
-//   {
-//     month: "Jan",
-//     times: 5,
-//   },
-//   {
-//     month: "Dec",
-//     times: 0,
-//   },
-//   {
-//     month: "Nov",
-//     times: 0,
-//   },
-//   {
-//     month: "Oct",
-//     times: 0,
-//   },
-//   {
-//     month: "Sep",
-//     times: 0,
-//   },
-//   {
-//     month: "Aug",
-//     times: 0,
-//   },
-//   {
-//     month: "Jul",
-//     times: 0,
-//   },
-//   {
-//     month: "Jun",
-//     times: 0,
-//   },
-//   {
-//     month: "May",
-//     times: 0,
-//   },
-// ].reverse();
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { MinusIcon, PlusIcon } from "lucide-react";
 
 export default function HabitPage({
   params: { id },
@@ -204,16 +163,57 @@ export default function HabitPage({
 
   const data = getChartData(habit as Habit);
 
+  const [isEditHabitModalOpen, setIsEditHabitModalOpen] = useState(false);
+
+  const [goal, setGoal] = useState(5);
+  const [newHabit, setNewHabit] = useState<IHabit>({
+    name: "",
+    status: [{ date: "" }],
+    id: "",
+    goalPerWeek: 0,
+  });
+
+  const updateHabitInFirestore = async (uniqueId: string) => {
+    try {
+      const docRef = await updateDoc(doc(db, "habit", uniqueId), {
+        // userEmail: auth.currentUser?.email,
+        name: newHabit.name,
+        goalPerWeek: goal,
+        // status: [],
+      });
+      console.log("Document written with ID: ", docRef);
+      return docRef;
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  const handleEditHabit = async () => {
+    setHabit(newHabit);
+    setIsEditHabitModalOpen(false);
+    await updateHabitInFirestore(id);
+  };
+
   useEffect(() => {
     getHabitById(id).then((data) => {
       console.log(data);
       setHabit(data as IHabit);
+      setNewHabit(data as IHabit);
+      setGoal(data?.goalPerWeek);
     });
   }, [id]);
 
   return (
     <div>
-      <Header title={habit.name} isBackButton />
+      <Header
+        title={habit.name}
+        isBackButton
+        isEditButton
+        editButtonCallback={() => {
+          console.log("Edit button clicked");
+          setIsEditHabitModalOpen(true);
+        }}
+      />
 
       <main className="px-8 py-4 flex flex-col gap-8">
         <div className="">
@@ -263,6 +263,83 @@ export default function HabitPage({
           />
         </div>
       </main>
+
+      <Dialog
+        open={isEditHabitModalOpen}
+        onOpenChange={setIsEditHabitModalOpen}
+      >
+        <DialogTrigger asChild>
+          <Button
+            className="absolute bottom-8 right-8 w-16 h-16 rounded-2xl"
+            onClick={() => {
+              setIsEditHabitModalOpen(true);
+            }}
+          >
+            <i className="ri-add-large-fill ri-xl text-bold"></i>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="">
+          <DialogHeader>
+            <DialogTitle>Add New Habit</DialogTitle>
+            <DialogDescription>
+              Start tracking your progress and building positive routines!
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Input
+                id="name"
+                value={newHabit.name}
+                onChange={(event) => {
+                  const habitCopy = { ...habit };
+                  habitCopy.name = event.target.value;
+                  // setHabit(habitCopy);
+                  setNewHabit(habitCopy);
+                }}
+                className="col-span-4"
+                placeholder="Habit name"
+              />
+            </div>
+            <div className="p-4 pb-0">
+              <div className="flex items-center justify-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 shrink-0 rounded-full"
+                  onClick={() => setGoal(goal - 1)}
+                  disabled={goal <= 1}
+                >
+                  <MinusIcon className="h-4 w-4" />
+                  <span className="sr-only">Decrease</span>
+                </Button>
+                <div className="flex-1 text-center">
+                  <div className="text-7xl font-bold tracking-tighter">
+                    {goal}
+                  </div>
+                  <div className="text-[0.70rem] uppercase text-muted-foreground">
+                    days per week
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 shrink-0 rounded-full"
+                  onClick={() => setGoal(goal + 1)}
+                  disabled={goal >= 7}
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  <span className="sr-only">Increase</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" onClick={handleEditHabit}>
+              Commit to Habit!
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

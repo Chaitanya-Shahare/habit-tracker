@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Pencil, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import "remixicon/fonts/remixicon.css";
@@ -25,10 +25,14 @@ import {
 export default function Header({
   title,
   isBackButton = false,
+  isEditButton = false,
+  editButtonCallback,
   isAvatar = false,
 }: {
   title?: string;
   isBackButton?: boolean;
+  isEditButton?: boolean;
+  editButtonCallback?: () => void;
   isAvatar?: boolean;
 }) {
   const { theme, setTheme } = useTheme();
@@ -39,6 +43,9 @@ export default function Header({
     router.push("/signin");
     localStorage.removeItem("user");
   };
+
+  const user = JSON.parse(localStorage.getItem("user")!);
+
   return (
     <>
       <header className="border-b-2 p-4 flex justify-between items-center">
@@ -59,6 +66,11 @@ export default function Header({
           </h2>
         </div>
         <div className="flex justify-center gap-4">
+          {isEditButton && (
+            <Button variant={"ghost"} onClick={editButtonCallback}>
+              <Pencil className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-100" />
+            </Button>
+          )}
           <Button
             variant={"ghost"}
             onClick={() => {
@@ -76,57 +88,16 @@ export default function Header({
               {/* <Button variant="outline">Open</Button> */}
               {isAvatar && (
                 <Avatar>
-                  <AvatarImage
-                    src={
-                      auth.currentUser?.photoURL ||
-                      "https://github.com/shadcn.png"
-                    }
-                  />
-                  <AvatarFallback>CS</AvatarFallback>
+                  <AvatarImage src={auth.currentUser?.photoURL || ""} />
+                  <AvatarFallback>
+                    {user.email.split("")[0].toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
               )}
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {/* <DropdownMenuGroup> */}
-              {/*   <DropdownMenuItem> */}
-              {/*     Profile */}
-              {/*     <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-              {/*   </DropdownMenuItem> */}
-              {/*   <DropdownMenuItem> */}
-              {/*     Billing */}
-              {/*     <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-              {/*   </DropdownMenuItem> */}
-              {/*   <DropdownMenuItem> */}
-              {/*     Settings */}
-              {/*     <DropdownMenuShortcut>⌘S</DropdownMenuShortcut> */}
-              {/*   </DropdownMenuItem> */}
-              {/*   <DropdownMenuItem> */}
-              {/*     Keyboard shortcuts */}
-              {/*     <DropdownMenuShortcut>⌘K</DropdownMenuShortcut> */}
-              {/*   </DropdownMenuItem> */}
-              {/* </DropdownMenuGroup> */}
-              {/* <DropdownMenuSeparator /> */}
-              {/* <DropdownMenuGroup> */}
-              {/*   <DropdownMenuItem>Team</DropdownMenuItem> */}
-              {/*   <DropdownMenuSub> */}
-              {/*     <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger> */}
-              {/*     <DropdownMenuPortal> */}
-              {/*       <DropdownMenuSubContent> */}
-              {/*         <DropdownMenuItem>Email</DropdownMenuItem> */}
-              {/*         <DropdownMenuItem>Message</DropdownMenuItem> */}
-              {/*         <DropdownMenuSeparator /> */}
-              {/*         <DropdownMenuItem>More...</DropdownMenuItem> */}
-              {/*       </DropdownMenuSubContent> */}
-              {/*     </DropdownMenuPortal> */}
-              {/*   </DropdownMenuSub> */}
-              {/*   <DropdownMenuItem> */}
-              {/*     New Team */}
-              {/*     <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut> */}
-              {/*   </DropdownMenuItem> */}
-              {/* </DropdownMenuGroup> */}
-              {/* <DropdownMenuSeparator /> */}
               <DropdownMenuItem>
                 <Link href="https://github.com/Chaitanya-Shahare/habit-tracker">
                   GitHub
