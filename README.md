@@ -29,10 +29,18 @@ local machine for development and testing purposes.
 
 ### Installation
 
-1. Clone the repo ```bash git clone
-https://github.com/Chaitanya-Shahare/habit-tracker.git ```
-2. Install NPM packages ```bash npm install ```
-3. Start the development server ```bash npm run dev ```
+1. Clone the repo 
+   ```bash 
+	 git clone https://github.com/Chaitanya-Shahare/habit-tracker.git 
+	 ```
+2. Install NPM packages 
+	 ```bash
+	 npm install
+	 ```
+3. Start the development server 
+	 ```bash
+	 npm run dev
+	 ```
 4. Open [http://localhost:3000](http://localhost:3000) with your browser to see
 the result.
 
@@ -59,4 +67,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Your Name - [shaharechaitanya3@gmail.com](mailto:shaharechaitanya3@gmail.com)
 
-```
