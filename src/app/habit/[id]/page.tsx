@@ -3,12 +3,12 @@ import Header from "@/components/header";
 import "react-calendar-heatmap/dist/styles.css";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "./style.css";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Bar, BarChart, ResponsiveContainer, XAxis } from "recharts";
 import { auth, db } from "@/app/firebase/config";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { IHabit } from "@/app/page";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +38,8 @@ export default function HabitPage({
     today.getMonth(),
     today.getDate() - 144
   );
+
+  const router = useRouter();
 
   const getHabitById = async (id: string) => {
     const docRef = doc(db, "habit", id);
@@ -194,6 +196,12 @@ export default function HabitPage({
     await updateHabitInFirestore(id);
   };
 
+  const handleDeleteHabit = async () => {
+    const docRef = doc(db, "habit", id);
+    await deleteDoc(docRef);
+    router.push("/");
+  };
+
   useEffect(() => {
     getHabitById(id).then((data) => {
       console.log(data);
@@ -213,6 +221,8 @@ export default function HabitPage({
           console.log("Edit button clicked");
           setIsEditHabitModalOpen(true);
         }}
+        isMoreButton
+        deleteHabitCallback={handleDeleteHabit}
       />
 
       <main className="px-8 py-4 flex flex-col gap-8">

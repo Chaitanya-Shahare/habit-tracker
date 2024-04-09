@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
-import { Moon, Pencil, Sun } from "lucide-react";
+import { EllipsisVertical, Moon, Pencil, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import "remixicon/fonts/remixicon.css";
@@ -27,13 +27,17 @@ export default function Header({
   isBackButton = false,
   isEditButton = false,
   editButtonCallback,
+  isMoreButton = false,
   isAvatar = false,
+  deleteHabitCallback,
 }: {
   title?: string;
   isBackButton?: boolean;
   isEditButton?: boolean;
   editButtonCallback?: () => void;
+  isMoreButton?: boolean;
   isAvatar?: boolean;
+  deleteHabitCallback?: () => void;
 }) {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
@@ -71,17 +75,33 @@ export default function Header({
               <Pencil className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-100" />
             </Button>
           )}
-          <Button
-            variant={"ghost"}
-            onClick={() => {
-              if (theme == "light") setTheme("dark");
-              else setTheme("light");
-            }}
-          >
-            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          {!isMoreButton ? (
+            <Button
+              variant={"ghost"}
+              onClick={() => {
+                if (theme == "light") setTheme("dark");
+                else setTheme("light");
+              }}
+            >
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+
+                <Button variant={"ghost"} onClick={editButtonCallback}>
+                  <EllipsisVertical className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-100" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuItem onClick={deleteHabitCallback}>
+                  Delete habit
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

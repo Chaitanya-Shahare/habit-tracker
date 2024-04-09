@@ -57,18 +57,7 @@ export default function Home() {
     return { day: days[day], date: date, dateString: formattedDate };
   });
 
-  const [habits, setHabits] = useState<IHabit[]>([
-    // {
-    //   id: "1",
-    //   name: "Play guitar",
-    //   status: [{ date: "2024-04-05" }, { date: "2024-04-03" }],
-    // },
-    // {
-    //   id: "2",
-    //   name: "Read a book",
-    //   status: [],
-    // },
-  ]);
+  const [habits, setHabits] = useState<IHabit[]>([]);
 
   const [isAddHabitModalOpen, setIsAddHabitModalOpen] = useState(false);
   const [goal, setGoal] = useState(5);
@@ -154,6 +143,7 @@ export default function Home() {
       });
       console.log(habits);
     }
+    // eslint-disable-next-line
   }, []);
 
   return (
