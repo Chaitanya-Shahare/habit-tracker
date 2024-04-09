@@ -29,6 +29,7 @@ const SignInPage = () => {
     if (localStorage.getItem("user")) {
       router.replace("/");
     }
+		// eslint-disable-next-line
   }, []);
 
   const [email, setEmail] = useState("");
