@@ -48,6 +48,7 @@ the result.
 
 <!-- TODO - Add screenshots & video guide -->
 
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to
@@ -65,5 +66,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Your Name - [shaharechaitanya3@gmail.com](mailto:shaharechaitanya3@gmail.com)
+Chaitanya Shahare - [shaharechaitanya3@gmail.com](mailto:shaharechaitanya3@gmail.com)
 
