@@ -49,7 +49,6 @@ export default function Header({
   };
 
   // const user = JSON.parse(localStorage.getItem("user")!);
-  console.log(auth.currentUser?.photoURL)
 
   return (
     <>
