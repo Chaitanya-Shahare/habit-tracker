@@ -49,6 +49,7 @@ export default function Header({
   };
 
   // const user = JSON.parse(localStorage.getItem("user")!);
+  console.log(auth.currentUser?.photoURL)
 
   return (
     <>
@@ -90,7 +91,6 @@ export default function Header({
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-
                 <Button variant={"ghost"} onClick={editButtonCallback}>
                   <EllipsisVertical className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-100" />
                 </Button>

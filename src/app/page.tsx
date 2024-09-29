@@ -101,6 +101,9 @@ export default function Home() {
     const userEmail = localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user")!).email
       : auth.currentUser?.email;
+    if (!userEmail) {
+      return;
+    }
     const q = query(
       collection(db, "habit"),
       where("userEmail", "==", userEmail)

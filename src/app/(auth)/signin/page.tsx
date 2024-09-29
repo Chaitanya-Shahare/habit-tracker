@@ -1,11 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  useSignInWithEmailAndPassword,
   useSignInWithGoogle,
-  useSignInWithGithub,
 } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import {
   CardTitle,
@@ -29,7 +28,7 @@ const SignInPage = () => {
     if (localStorage.getItem("user")) {
       router.replace("/");
     }
-		// eslint-disable-next-line
+    // eslint-disable-next-line
   }, []);
 
   const [email, setEmail] = useState("");
@@ -43,27 +42,41 @@ const SignInPage = () => {
     setPassword(e.target.value);
   };
 
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
+  // using functions given by firebase/auth
+
+  const auth = getAuth();
+
+  // const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
   const handleSubmit = async () => {
-    // Add your signup logic here
+    // Add your signin logic here
     try {
-      const res = await signInWithEmailAndPassword(email, password);
-      console.log(res);
-      console.log("name", auth.currentUser);
-      setEmail("");
-      setPassword("");
-      if (res) {
-        localStorage.setItem("user", JSON.stringify(res.user));
-        router.push("/");
-      }
+      // const res = await signInWithEmailAndPassword(email, password);
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential?.user;
+          console.log(user);
+          console.log("name", auth.currentUser);
+          if (user) {
+            localStorage.setItem("user", JSON.stringify(user));
+            console.log("user saved & logged in", user);
+            setEmail("");
+            setPassword("");
+            router.push("/");
+          }
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
     } catch (error) {
       console.error(error);
     }
   };
 
   const [signInWithGoogle] = useSignInWithGoogle(auth);
-  const [signInWithGithub] = useSignInWithGithub(auth);
+  // const [signInWithGithub] = useSignInWithGithub(auth);
 
   const handleGoogleSignIn = async () => {
     const res = await signInWithGoogle();
