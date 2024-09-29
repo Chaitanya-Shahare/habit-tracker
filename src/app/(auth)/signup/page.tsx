@@ -96,7 +96,7 @@ const SignupPage = () => {
                 handleSubmit();
               }}
             >
-              SignUp
+              Sign Up
             </Button>
           </div>
 
@@ -109,7 +109,15 @@ const SignupPage = () => {
             </Button>
           </div>
 
-          <Link href="/signin"> Sign In</Link>
+          <div className="mt-4">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={() => {router.push("/signin")}}
+            >
+              Login to your account, Sign In
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

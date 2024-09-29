@@ -122,7 +122,7 @@ const SignInPage = () => {
               />
             </div>
             <Button className="w-full" type="submit" onClick={handleSubmit}>
-              Login
+              Log In
             </Button>
           </div>
 
@@ -138,7 +138,17 @@ const SignInPage = () => {
               Sign In with Google
             </Button>
           </div>
-          <Link href="/signup"> Signup</Link>
+
+          <div className="mt-4">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={() => {router.push("/signup")}}
+            >
+              Create a new account, Sign Up
+            </Button>
+          </div>
+
         </CardContent>
       </Card>
     </div>
