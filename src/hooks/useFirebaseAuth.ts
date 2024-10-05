@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 const useFirebaseAuth = () => {
   const router = useRouter();
   const { theme } = useTheme();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,21 +25,9 @@ const useFirebaseAuth = () => {
     setPassword(e.target.value);
   };
 
-  const handleSignIn = () => {
-    // Signin logic
-    const promise = signInWithEmailAndPassword(auth, email, password)
-      .then((res) => {
-        const user = res?.user;
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-          setEmail("");
-          setPassword("");
-          router.push("/");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const handleSignIn = async () => {
+    try {
+      const promise = signInWithEmailAndPassword(auth, email, password);
 
       toast.promise(
         promise,
@@ -49,44 +38,74 @@ const useFirebaseAuth = () => {
         },
         { theme }
       );
+
+      const res = await promise;
+      const user = res?.user;
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        setEmail("");
+        setPassword("");
+        router.push("/");
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMessage = (error as any).message || "Error signing in";
+      toast.error(errorMessage, { theme });
+    }
   };
 
   const handleSignUp = async () => {
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
+      const promise = createUserWithEmailAndPassword(auth, email, password);
+
+      toast.promise(
+        promise,
+        {
+          pending: "Signing up...",
+          success: "Signed up successfully! Please sign in to continue.",
+          error: "Error signing up",
+        },
+        { theme }
+      );
+
+      const res = await promise;
       setEmail("");
       setPassword("");
       router.push("/signin");
-      toast.success("Signed up successfully!", { theme });
-      toast.info("Please sign in to continue", { theme });
     } catch (error) {
       console.error(error);
-      toast.error("Error signing up", { theme });
+      const errorMessage = (error as any).message || "Error signing up";
+      toast.error(errorMessage, { theme });
     }
   };
 
-  const handleGoogleSignIn = () => {
-    const promise = signInWithPopup(auth, new GoogleAuthProvider())
-      .then((res) => {
-        const user = res.user;
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-          router.push("/");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const handleGoogleSignIn = async () => {
+    try {
+      const promise = signInWithPopup(auth, new GoogleAuthProvider());
 
-    toast.promise(
-      promise,
-      {
-        pending: "Signing in with Google...",
-        success: "Logged in successfully!",
-        error: "Error signing in",
-      },
-      { theme }
-    );
+      toast.promise(
+        promise,
+        {
+          pending: "Signing in with Google...",
+          success: "Logged in successfully!",
+          error: "Error signing in",
+        },
+        { theme }
+      );
+
+      const res = await promise;
+      const user = res?.user;
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        router.push("/");
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMessage = (error as any).message || "Error signing in";
+      toast.error(errorMessage, { theme });
+    }
   };
 
   return {
