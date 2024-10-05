@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { auth } from "@/app/firebase/config";
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import {
   CardTitle,
@@ -14,61 +12,27 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
-
 import "remixicon/fonts/remixicon.css";
+import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 
 const SignInPage = () => {
   const router = useRouter();
 
-  // If user already logged in 
+  // If user already logged in
   useEffect(() => {
     if (localStorage.getItem("user")) {
       router.replace("/");
     }
-    // eslint-disable-next-line
-  }, []);
+  }, [router]);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleEmailChange = (e: any) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: any) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSubmit = async () => {
-    // Signin logic
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential?.user;
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-          setEmail("");
-          setPassword("");
-          router.push("/");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleGoogleSignIn = () => {
-    signInWithPopup(auth, new GoogleAuthProvider())
-      .then((result) => {
-        const user = result.user;
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-          router.push("/");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
+  const {
+    email,
+    password,
+    handleEmailChange,
+    handlePasswordChange,
+    handleSignIn,
+    handleGoogleSignIn,
+  } = useFirebaseAuth();
 
   return (
     <div className="min-h-screen flex flex-col gap-24">
@@ -103,7 +67,7 @@ const SignInPage = () => {
                 onChange={handlePasswordChange}
               />
             </div>
-            <Button className="w-full" type="submit" onClick={handleSubmit}>
+            <Button className="w-full" type="submit" onClick={handleSignIn}>
               Log In
             </Button>
           </div>

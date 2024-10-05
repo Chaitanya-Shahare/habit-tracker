@@ -1,6 +1,5 @@
 "use client";
 import React, { useLayoutEffect, useState } from "react";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
 
 import {
@@ -16,45 +15,26 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import { useRouter } from "next/navigation";
 import "remixicon/fonts/remixicon.css";
-import Link from "next/link";
+import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 
 const SignupPage = () => {
   const router = useRouter();
 
+  // TODO: compare what is better to use here, useEffect or useLayoutEffect with auth.currentUser or localStorage.getItem("user")
   useLayoutEffect(() => {
     if (auth.currentUser) {
       router.replace("/");
     }
   }, [router]);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleEmailChange = (e: any) => {
-    setEmail(e.target.value);
-    console.log("email", email);
-  };
-
-  const handlePasswordChange = (e: any) => {
-    setPassword(e.target.value);
-    console.log("password", password);
-  };
-
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth);
-
-  const handleSubmit = async () => {
-    try {
-      console.log("before res in handlesubmit in signup page.tsx");
-      const res = await createUserWithEmailAndPassword(email, password);
-      console.log("res in handlesubmit in signup page.tsx", res);
-      setEmail("");
-      setPassword("");
-      router.push("/signin");
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const {
+    email,
+    password,
+    handleEmailChange,
+    handlePasswordChange,
+    handleSignUp,
+    handleGoogleSignIn,
+  } = useFirebaseAuth();
 
   return (
     <div className="min-h-screen flex flex-col gap-24">
@@ -93,7 +73,7 @@ const SignupPage = () => {
               className="w-full"
               type="submit"
               onClick={() => {
-                handleSubmit();
+                handleSignUp();
               }}
             >
               Sign Up
@@ -103,7 +83,11 @@ const SignupPage = () => {
           <div className="text-center mt-4 text-muted-foreground">OR</div>
 
           <div className="mt-4">
-            <Button className="w-full" variant="outline">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={handleGoogleSignIn}
+            >
               <i className="ri-google-fill mr-2 ri-xl"></i>
               Sign Up with Google
             </Button>
@@ -113,7 +97,9 @@ const SignupPage = () => {
             <Button
               className="w-full"
               variant="outline"
-              onClick={() => {router.push("/signin")}}
+              onClick={() => {
+                router.push("/signin");
+              }}
             >
               Login to your account, Sign In
             </Button>
