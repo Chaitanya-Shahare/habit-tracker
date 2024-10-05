@@ -1,5 +1,5 @@
 "use client";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { auth } from "@/app/firebase/config";
 
 import {
@@ -20,9 +20,8 @@ import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 const SignupPage = () => {
   const router = useRouter();
 
-  // TODO: compare what is better to use here, useEffect or useLayoutEffect with auth.currentUser or localStorage.getItem("user")
-  useLayoutEffect(() => {
-    if (auth.currentUser) {
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
       router.replace("/");
     }
   }, [router]);

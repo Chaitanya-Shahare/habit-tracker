@@ -18,7 +18,6 @@ import useFirebaseAuth from "@/hooks/useFirebaseAuth";
 const SignInPage = () => {
   const router = useRouter();
 
-  // If user already logged in
   useEffect(() => {
     if (localStorage.getItem("user")) {
       router.replace("/");
