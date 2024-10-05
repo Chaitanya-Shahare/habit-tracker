@@ -4,6 +4,7 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
 } from "firebase/auth";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -108,6 +109,19 @@ const useFirebaseAuth = () => {
     }
   };
 
+
+  const handleSignOut = async () => {
+    try {
+
+    await signOut(auth);
+    router.push("/signin");
+    localStorage.removeItem("user");
+
+    } catch (error) {
+      console.error(error) 
+    }
+  };
+
   return {
     email,
     password,
@@ -116,6 +130,7 @@ const useFirebaseAuth = () => {
     handleSignIn,
     handleSignUp,
     handleGoogleSignIn,
+    handleSignOut
   };
 };
 

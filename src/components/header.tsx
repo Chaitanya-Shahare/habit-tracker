@@ -4,9 +4,7 @@ import { EllipsisVertical, Moon, Pencil, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import "remixicon/fonts/remixicon.css";
-import { auth } from "@/app/firebase/config";
 import Link from "next/link";
-import { signOut } from "firebase/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +19,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
+import useFirebaseAuth from "@/hooks/useFirebaseAuth";
+import { auth } from "@/app/firebase/config";
 
 export default function Header({
   title,
@@ -39,16 +40,13 @@ export default function Header({
   isAvatar?: boolean;
   deleteHabitCallback?: () => void;
 }) {
+
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
-  const handleSignOut = async () => {
-    await signOut(auth);
-    router.push("/signin");
-    localStorage.removeItem("user");
-  };
+   const {handleSignOut} = useFirebaseAuth();
 
-  // const user = JSON.parse(localStorage.getItem("user")!);
+  const [user] = useState<any>(JSON.parse(localStorage.getItem("user") || "{}"));
 
   return (
     <>
@@ -114,9 +112,9 @@ export default function Header({
                     }
                   />
                   {/* TODO: uncomment below line */}
-                  {/* <AvatarFallback> */}
-                  {/*   {user.email.split("")[0].toUpperCase()} */}
-                  {/* </AvatarFallback> */}
+                   <AvatarFallback>
+                     {user.email.split("")[0].toUpperCase()}
+                   </AvatarFallback>
                 </Avatar>
               )}
             </DropdownMenuTrigger>
