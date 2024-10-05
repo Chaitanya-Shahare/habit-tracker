@@ -46,7 +46,7 @@ export default function Header({
 
    const {handleSignOut} = useFirebaseAuth();
 
-  const [user] = useState<any>(JSON.parse(localStorage.getItem("user") || "{}"));
+  // const [user] = useState<any>(JSON.parse(localStorage.getItem("user") || "{}"));
 
   return (
     <>
@@ -112,9 +112,9 @@ export default function Header({
                     }
                   />
                   {/* TODO: uncomment below line */}
-                   <AvatarFallback>
+                   {/* <AvatarFallback>
                      {user.email.split("")[0].toUpperCase()}
-                   </AvatarFallback>
+                   </AvatarFallback> */}
                 </Avatar>
               )}
             </DropdownMenuTrigger>

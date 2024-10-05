@@ -137,7 +137,6 @@ export default function Home() {
     }
   };
 
-  // TODO: uncomment this
   useEffect(() => {
     if (localStorage.getItem("user")) {
       getHabits().then((data: any) => {
