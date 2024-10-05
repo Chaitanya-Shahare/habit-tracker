@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "@/components/next-toast-container";
+import { Bounce } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,6 +43,19 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme={"colored"}
+          transition={Bounce}
+        />
       </body>
     </html>
   );
