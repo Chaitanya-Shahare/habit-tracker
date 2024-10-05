@@ -1,10 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  useSignInWithGoogle,
-} from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import {
   CardTitle,
@@ -19,11 +16,11 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 
 import "remixicon/fonts/remixicon.css";
-import Link from "next/link";
 
 const SignInPage = () => {
   const router = useRouter();
 
+  // If user already logged in 
   useEffect(() => {
     if (localStorage.getItem("user")) {
       router.replace("/");
@@ -42,51 +39,36 @@ const SignInPage = () => {
     setPassword(e.target.value);
   };
 
-  // using functions given by firebase/auth
-
-  const auth = getAuth();
-
-  // const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
-
   const handleSubmit = async () => {
-    // Add your signin logic here
-    try {
-      // const res = await signInWithEmailAndPassword(email, password);
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential?.user;
-          console.log(user);
-          console.log("name", auth.currentUser);
-          if (user) {
-            localStorage.setItem("user", JSON.stringify(user));
-            console.log("user saved & logged in", user);
-            setEmail("");
-            setPassword("");
-            router.push("/");
-          }
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-        });
-    } catch (error) {
-      console.error(error);
-    }
+    // Signin logic
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential?.user;
+        if (user) {
+          localStorage.setItem("user", JSON.stringify(user));
+          setEmail("");
+          setPassword("");
+          router.push("/");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
-  const [signInWithGoogle] = useSignInWithGoogle(auth);
-  // const [signInWithGithub] = useSignInWithGithub(auth);
-
-  const handleGoogleSignIn = async () => {
-    const res = await signInWithGoogle();
-    // const res = await signInWithGithub();
-    console.log(res);
-    if (res) {
-      localStorage.setItem("user", JSON.stringify(res.user));
-      router.push("/");
-    }
-  };
+  const handleGoogleSignIn = () => {
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .then((result) => {
+        const user = result.user;
+        if (user) {
+          localStorage.setItem("user", JSON.stringify(user));
+          router.push("/");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   return (
     <div className="min-h-screen flex flex-col gap-24">
@@ -143,12 +125,13 @@ const SignInPage = () => {
             <Button
               className="w-full"
               variant="outline"
-              onClick={() => {router.push("/signup")}}
+              onClick={() => {
+                router.push("/signup");
+              }}
             >
               Create a new account, Sign Up
             </Button>
           </div>
-
         </CardContent>
       </Card>
     </div>
