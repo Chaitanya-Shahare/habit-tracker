@@ -19,8 +19,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
-import useFirebaseAuth from "@/hooks/useFirebaseAuth";
+import useFirebaseAuth from "@/hooks/useAuth";
 import { auth } from "@/app/firebase/config";
 
 export default function Header({

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { auth } from "@/app/firebase/config";
 
 import {
   CardTitle,
@@ -15,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import { useRouter } from "next/navigation";
 import "remixicon/fonts/remixicon.css";
-import useFirebaseAuth from "@/hooks/useFirebaseAuth";
+import useAuth from "@/hooks/useAuth";
 
 const SignupPage = () => {
   const router = useRouter();
@@ -33,7 +32,7 @@ const SignupPage = () => {
     handlePasswordChange,
     handleSignUp,
     handleGoogleSignIn,
-  } = useFirebaseAuth();
+  } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col gap-24">

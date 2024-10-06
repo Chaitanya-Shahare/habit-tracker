@@ -11,9 +11,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const useFirebaseAuth = () => {
+const useAuth = () => {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme: originalTheme } = useTheme();
+
+  const [theme, setTheme] = useState<"colored" | "dark">(originalTheme === "light" ? "colored" : "dark");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -134,4 +136,4 @@ const useFirebaseAuth = () => {
   };
 };
 
-export default useFirebaseAuth;
+export default useAuth;

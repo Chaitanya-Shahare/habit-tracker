@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import "remixicon/fonts/remixicon.css";
-import useFirebaseAuth from "@/hooks/useFirebaseAuth";
+import useAuth from "@/hooks/useAuth";
 
 const SignInPage = () => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const SignInPage = () => {
     handlePasswordChange,
     handleSignIn,
     handleGoogleSignIn,
-  } = useFirebaseAuth();
+  } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col gap-24">
