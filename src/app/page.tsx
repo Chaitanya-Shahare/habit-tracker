@@ -27,13 +27,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { nanoid } from "nanoid";
+import { IHabit } from "@/app/type";
 
-export interface IHabit {
-  name: string;
-  status: { date: string }[];
-  id: string;
-  goalPerWeek?: number;
-}
 
 export default function Home() {
   const router = useRouter();

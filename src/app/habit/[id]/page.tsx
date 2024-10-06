@@ -7,7 +7,7 @@ import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Bar, BarChart, ResponsiveContainer, XAxis } from "recharts";
 import { auth, db } from "@/app/firebase/config";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { IHabit } from "@/app/page";
+import { IHabit } from "@/app/type";
 import { redirect, useRouter } from "next/navigation";
 import {
   Dialog,
