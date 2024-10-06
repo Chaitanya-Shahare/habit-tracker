@@ -21,17 +21,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { withAuth } from "@/components/with-auth";
 
-export default function HabitPage({
+function HabitPage({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  useLayoutEffect(() => {
-    if (!auth.currentUser) {
-      redirect("/signin");
-    }
-  }, []);
+
   const today = new Date();
   const startDate = new Date(
     today.getFullYear(),
@@ -353,3 +350,5 @@ export default function HabitPage({
     </div>
   );
 }
+
+export default withAuth(HabitPage);

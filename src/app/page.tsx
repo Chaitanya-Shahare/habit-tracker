@@ -1,5 +1,4 @@
 "use client";
-import { auth, db } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
@@ -17,27 +16,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  setDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
 import { nanoid } from "nanoid";
 import { IHabit } from "@/app/type";
+import useHabits from "@/hooks/useHabits";
+import { withAuth } from "@/components/with-auth";
 
-
-export default function Home() {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!localStorage.getItem("user")) {
-      router.replace("/signin");
-    }
-  }, [router]);
+function Home() {
 
   // Get the last 5 days
   const last5Days = Array.from({ length: 5 }, (_, i) => {
@@ -52,96 +36,67 @@ export default function Home() {
     return { day: days[day], date: date, dateString: formattedDate };
   });
 
+  const [isAddHabitModalOpen, setIsAddHabitModalOpen] = useState(false);
+
   const [habits, setHabits] = useState<IHabit[]>([]);
 
-  const [isAddHabitModalOpen, setIsAddHabitModalOpen] = useState(false);
   const [goal, setGoal] = useState(5);
+
   const [newHabit, setNewHabit] = useState({
     name: "",
     goalPerWeek: goal,
     status: Array.from({ length: 5 }, () => false),
   });
 
-  const addHabitToFirestore = async (uniqueId: string) => {
-    try {
-      const docRef = await setDoc(doc(db, "habit", uniqueId), {
-        userEmail: auth.currentUser?.email,
-        name: newHabit.name,
-        goalPerWeek: goal,
-        status: [],
-      });
-      console.log("Document written with ID: ", docRef);
-      return docRef;
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
+  const { getHabits, addHabit, updateHabit } = useHabits();
 
   const handleAddHabit = async () => {
-    console.log("handleAddHabit");
     const newHabits = [...habits];
     const uniqueId = nanoid();
     newHabits.push({
       name: newHabit.name,
       status: [],
+      goalPerWeek: goal,
       id: uniqueId,
     });
     setHabits(newHabits);
     setIsAddHabitModalOpen(false);
-    await addHabitToFirestore(uniqueId);
+    await addHabit(newHabit, uniqueId);
     getHabits();
   };
 
-  const getHabits = async () => {
-    const userEmail = localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user")!).email
-      : auth.currentUser?.email;
-    if (!userEmail) {
-      return;
+  const handleUpdateHabit = async (
+    habitIndex: number,
+    dayIndex: number,
+    dateExists: boolean,
+    dayObj: any
+  ) => {
+    const newHabits = [...habits];
+    if (dateExists) {
+      newHabits[habitIndex].status = newHabits[habitIndex].status.filter(
+        (statusObj) => statusObj.date !== dayObj.dateString
+      );
+    } else {
+      newHabits[habitIndex].status.push({
+        date: dayObj.dateString,
+      });
     }
-    const q = query(
-      collection(db, "habit"),
-      where("userEmail", "==", userEmail)
-      // orderBy("name", "desc") // Add this line
-    );
-    const querySnapshot = await getDocs(q);
-    const docs = querySnapshot.docs.map((doc) => {
-      return { ...doc.data(), id: doc.id };
-    });
-    return docs;
-  };
-
-  const updateHabitInFirestore = async (id: string, habit: IHabit) => {
-    try {
-      const docRef = doc(db, "habit", id);
-      updateDoc(docRef, {
-        status: habit.status,
-      })
-        .then((docRef) => {
-          console.log(
-            "A New Document Field has been added to an existing document",
-            docRef
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      return docRef;
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+    // console.log("newHabits[index]", newHabits[habitIndex]);
+    await updateHabit(newHabits[habitIndex].id, newHabits[habitIndex]);
+    setHabits(newHabits);
   };
 
   useEffect(() => {
     if (localStorage.getItem("user")) {
-      getHabits().then((data: any) => {
-        setHabits(data);
-        console.log(data);
-      });
-      console.log(habits);
+      getHabits()
+        .then((data: any) => {
+          setHabits(data);
+        })
+        .catch((error) => {
+          console.error("Error getting documents: ", error);
+        });
     }
-    // eslint-disable-next-line
-  }, []);
+  }, [getHabits]);
 
   return (
     <>
@@ -231,42 +186,29 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {habits.map((habit, index) => (
-              <tr key={index} className="border-b-2 h-[60px]">
+            {habits.map((habit, habitIndex) => (
+              <tr key={habitIndex} className="border-b-2 h-[60px]">
                 <td className="text-md">
                   <Link href={`/habit/${habit.id}`}>{habit.name}</Link>
                 </td>
-                {last5Days.map((dayObj, i) => {
+
+                {last5Days.map((dayObj, dayIndex) => {
                   const dateExists = habit.status.some(
                     (statusObj) => statusObj.date === dayObj.dateString
                   );
+
                   return (
-                    <td key={i}>
+                    <td key={dayIndex}>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={async () => {
-                          const newHabits = [...habits];
-                          if (dateExists) {
-                            newHabits[index].status = newHabits[
-                              index
-                            ].status.filter(
-                              (statusObj) =>
-                                statusObj.date !== dayObj.dateString
-                            );
-
-                            console.log(newHabits[index]);
-                          } else {
-                            newHabits[index].status.push({
-                              date: dayObj.dateString,
-                            });
-                          }
-                          console.log("newHabits[index]", newHabits[index]);
-                          await updateHabitInFirestore(
-                            newHabits[index].id,
-                            newHabits[index]
+                        onClick={() => {
+                          handleUpdateHabit(
+                            habitIndex,
+                            dayIndex,
+                            dateExists,
+                            dayObj
                           );
-                          setHabits(newHabits);
                         }}
                       >
                         {dateExists ? (
@@ -286,3 +228,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuth(Home);
