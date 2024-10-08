@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import { useEffect, useState } from "react";
@@ -23,25 +22,9 @@ import { withAuth } from "@/components/with-auth";
 
 function Home() {
 
-  // Get the last 5 days
-  const last5Days = Array.from({ length: 5 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const day = d.getDay();
-    const date = d.getDate().toString().padStart(2, "0"); // format to 'dd'
-    const month = (d.getMonth() + 1).toString().padStart(2, "0"); // format to 'mm'
-    const year = d.getFullYear();
-    const formattedDate = `${year}-${month}-${date}`;
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return { day: days[day], date: date, dateString: formattedDate };
-  });
-
   const [isAddHabitModalOpen, setIsAddHabitModalOpen] = useState(false);
-
   const [habits, setHabits] = useState<IHabit[]>([]);
-
   const [goal, setGoal] = useState(5);
-
   const [newHabit, setNewHabit] = useState({
     name: "",
     goalPerWeek: goal,
@@ -85,6 +68,19 @@ function Home() {
     await updateHabit(newHabits[habitIndex].id, newHabits[habitIndex]);
     setHabits(newHabits);
   };
+
+  // Get the last 5 days
+  const last5Days = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const day = d.getDay();
+    const date = d.getDate().toString().padStart(2, "0"); // format to 'dd'
+    const month = (d.getMonth() + 1).toString().padStart(2, "0"); // format to 'mm'
+    const year = d.getFullYear();
+    const formattedDate = `${year}-${month}-${date}`;
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return { day: days[day], date: date, dateString: formattedDate };
+  });
 
   useEffect(() => {
     if (localStorage.getItem("user")) {
