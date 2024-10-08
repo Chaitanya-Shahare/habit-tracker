@@ -1,25 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
-import { useEffect, useState } from "react";
+import { use, useEffect, useLayoutEffect, useState } from "react";
 import "remixicon/fonts/remixicon.css";
-import { MinusIcon, PlusIcon } from "@radix-ui/react-icons";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { nanoid } from "nanoid";
 import { IHabit } from "@/app/type";
 import useHabits from "@/hooks/useHabits";
 import { withAuth } from "@/components/with-auth";
 import { AddHabitModal } from "@/components/add-habit-modal";
+import { useRouter } from "next/navigation";
 
 function Home() {
   const [isAddHabitModalOpen, setIsAddHabitModalOpen] = useState(false);
@@ -64,7 +54,6 @@ function Home() {
         date: dayObj.dateString,
       });
     }
-    // console.log("newHabits[index]", newHabits[habitIndex]);
     await updateHabit(newHabits[habitIndex].id, newHabits[habitIndex]);
     setHabits(newHabits);
   };
@@ -94,6 +83,13 @@ function Home() {
     }
   }, [getHabits]);
 
+
+    const router = useRouter()
+    useLayoutEffect(() => {
+      if (!localStorage.getItem("user")) {
+        router.replace("/signin");  
+      }
+    }, [router]);
   return (
     <>
       <AddHabitModal
@@ -162,4 +158,5 @@ function Home() {
   );
 }
 
+// export default Home;
 export default withAuth(Home);

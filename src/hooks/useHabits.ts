@@ -2,7 +2,9 @@ import { auth, db } from "@/app/firebase/config";
 import { IHabit } from "@/app/type";
 import {
   collection,
+  deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -13,11 +15,14 @@ import { useCallback } from "react";
 
 const useHabits = () => {
   const getUserEmail = (): string | null => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      return JSON.parse(user).email;
+    if (typeof window !== "undefined") {
+      const user = localStorage.getItem("user");
+      if (user) {
+        return JSON.parse(user).email;
+      }
+      return auth.currentUser?.email || null;
     }
-    return auth.currentUser?.email || null;
+    return null;
   };
 
   const userEmail = getUserEmail();
@@ -45,11 +50,13 @@ const useHabits = () => {
     [userEmail]
   );
 
-  const updateHabit = useCallback(async (id: string, habit: IHabit) => {
+  const updateHabit= useCallback(async (id: string, habit: IHabit) => {
     try {
       const docRef = doc(db, "habit", id);
 
       await updateDoc(docRef, {
+        name: habit.name,
+        goalPerWeek: habit.goalPerWeek,
         status: habit.status,
       });
 
@@ -81,10 +88,28 @@ const useHabits = () => {
     }
   }, [userEmail]);
 
+  const getHabitById = useCallback(async (id: string) => {
+    const docRef = doc(db, "habit", id);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      console.log("No such document!");
+    }
+  },[]);
+
+  const deleteHabit = async (id: string) => {
+    const docRef = doc(db, "habit", id);
+    await deleteDoc(docRef);
+  }
+
   return {
     getHabits,
     addHabit,
     updateHabit,
+    getHabitById,
+    deleteHabit,
   };
 };
 

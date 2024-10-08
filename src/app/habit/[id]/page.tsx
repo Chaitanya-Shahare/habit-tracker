@@ -8,28 +8,12 @@ import { Bar, BarChart, ResponsiveContainer, XAxis } from "recharts";
 import { auth, db } from "@/app/firebase/config";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { IHabit } from "@/app/type";
-import { redirect, useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { MinusIcon, PlusIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { withAuth } from "@/components/with-auth";
 import { AddHabitModal } from "@/components/add-habit-modal";
+import useHabits from "@/hooks/useHabits";
 
-function HabitPage({
-  params: { id },
-}: {
-  params: { id: string };
-}) {
-
+function HabitPage({ params: { id } }: { params: { id: string } }) {
   const today = new Date();
   const startDate = new Date(
     today.getFullYear(),
@@ -39,16 +23,7 @@ function HabitPage({
 
   const router = useRouter();
 
-  const getHabitById = async (id: string) => {
-    const docRef = doc(db, "habit", id);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return docSnap.data();
-    } else {
-      console.log("No such document!");
-    }
-  };
+  const { getHabitById, deleteHabit, updateHabit } = useHabits();
 
   const [habit, setHabit] = useState<IHabit>({
     name: "",
@@ -164,7 +139,6 @@ function HabitPage({
   const data = getChartData(habit as Habit);
 
   const [isEditHabitModalOpen, setIsEditHabitModalOpen] = useState(false);
-
   const [goal, setGoal] = useState(5);
   const [newHabit, setNewHabit] = useState<IHabit>({
     name: "",
@@ -173,30 +147,14 @@ function HabitPage({
     goalPerWeek: 0,
   });
 
-  const updateHabitInFirestore = async (uniqueId: string) => {
-    try {
-      const docRef = await updateDoc(doc(db, "habit", uniqueId), {
-        // userEmail: auth.currentUser?.email,
-        name: newHabit.name,
-        goalPerWeek: goal,
-        // status: [],
-      });
-      console.log("Document written with ID: ", docRef);
-      return docRef;
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
-
   const handleEditHabit = async () => {
-    setHabit(newHabit);
+    setHabit({ ...newHabit, goalPerWeek: goal });
     setIsEditHabitModalOpen(false);
-    await updateHabitInFirestore(id);
+    await updateHabit(id, { ...newHabit, goalPerWeek: goal });
   };
 
   const handleDeleteHabit = async () => {
-    const docRef = doc(db, "habit", id);
-    await deleteDoc(docRef);
+    deleteHabit(id);
     router.push("/");
   };
 
@@ -207,7 +165,7 @@ function HabitPage({
       setNewHabit(data as IHabit);
       setGoal(data?.goalPerWeek);
     });
-  }, [id]);
+  }, [getHabitById, id]);
 
   return (
     <div>
@@ -282,7 +240,6 @@ function HabitPage({
         handleAddHabit={handleEditHabit}
         isFab={false}
       />
-
     </div>
   );
 }
