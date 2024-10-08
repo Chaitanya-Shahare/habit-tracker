@@ -1,9 +1,6 @@
 "use client";
 import Header from "@/components/header";
 import "react-calendar-heatmap/dist/styles.css";
-import CalendarHeatmap from "react-calendar-heatmap";
-import "./style.css";
-import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Bar, BarChart, ResponsiveContainer, XAxis } from "recharts";
 import { auth, db } from "@/app/firebase/config";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -12,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { withAuth } from "@/components/with-auth";
 import { AddHabitModal } from "@/components/add-habit-modal";
 import useHabits from "@/hooks/useHabits";
+import Heatmap from "@/components/heatmap";
 
 function HabitPage({ params: { id } }: { params: { id: string } }) {
   const today = new Date();
@@ -194,7 +192,7 @@ function HabitPage({ params: { id } }: { params: { id: string } }) {
           </div>
         </div>
 
-        <div className=" h-60">
+        <div className="h-60">
           <p className="text-muted-foreground text-md">History</p>
           <ResponsiveContainer className="" width="100%" height="100%">
             <BarChart data={data}>
@@ -213,21 +211,7 @@ function HabitPage({ params: { id } }: { params: { id: string } }) {
           </ResponsiveContainer>
         </div>
 
-        <div className="heatmap-container">
-          <p className="text-muted-foreground text-md mb-4">Heatmap</p>
-          <CalendarHeatmap
-            startDate={startDate}
-            endDate={today}
-            values={habit.status}
-            classForValue={(value: any) => {
-              if (!value) {
-                return "color-empty";
-              }
-              return `color-scale-${value.count} color-filled`;
-            }}
-            gutterSize={2}
-          />
-        </div>
+        <Heatmap values={habit.status} />
       </main>
 
       <AddHabitModal
