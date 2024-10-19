@@ -106,9 +106,9 @@ const useHabits = () => {
 
   return {
     getHabits,
+    getHabitById,
     addHabit,
     updateHabit,
-    getHabitById,
     deleteHabit,
   };
 };
