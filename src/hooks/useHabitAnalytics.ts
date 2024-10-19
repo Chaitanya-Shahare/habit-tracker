@@ -10,6 +10,12 @@ interface ChartData {
 const useHabitAnalytics = () => {
 
   const getCurrentStreak = (status: { date: string }[]) => {
+    // Remove duplicates by ensuring unique dates
+    status = status.filter(
+      (value, index, self) =>
+        index === self.findIndex((t) => t.date === value.date)
+    );
+
     // Sort the status array in descending order of date
     status.sort(
       (a: Status, b: Status) =>
