@@ -5,7 +5,9 @@ track their daily habits. Users can visualize their habit consistency with a
 heatmap, add, edit, and delete habits, and create an account to save their
 habits. 
 
-Hosted Website: [https://habit-track-nu.vercel.app/](https://habit-track-nu.vercel.app/)
+Hosted Website: [habit-tracker.chaitanyashahare.com](https://habit-tracker.chaitanyashahare.com/)
+
+**Design Document**: [notes.chaitanyashahare.com/habit-tracker-app-design-document/](https://notes.chaitanyashahare.com/habit-tracker-app-design-document/) 
 
 ## Features
 
