@@ -83,13 +83,12 @@ function Home() {
     }
   }, [getHabits]);
 
-
-    const router = useRouter()
-    useLayoutEffect(() => {
-      if (!localStorage.getItem("user")) {
-        router.replace("/signin");  
-      }
-    }, [router]);
+  const router = useRouter();
+  useLayoutEffect(() => {
+    if (!localStorage.getItem("user")) {
+      router.replace("/signin");
+    }
+  }, [router]);
   return (
     <>
       <AddHabitModal
