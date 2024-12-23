@@ -8,7 +8,6 @@ interface ChartData {
 }
 
 const useHabitAnalytics = () => {
-
   const getCurrentStreak = (status: { date: string }[]) => {
     // Remove duplicates by ensuring unique dates
     status = status.filter(
@@ -94,8 +93,7 @@ const useHabitAnalytics = () => {
     // Create a new array starting from the current month and ending with the month 11 months ago
     let orderedMonths = months
       .slice(currentMonthIndex + 1)
-      .concat(months.slice(0, currentMonthIndex + 1))
-      .reverse();
+      .concat(months.slice(0, currentMonthIndex + 1));
 
     // Map the months to the desired output format
     let data: ChartData[] = orderedMonths.map((month) => ({
@@ -103,7 +101,7 @@ const useHabitAnalytics = () => {
       times: counts[month] || 0,
     }));
 
-    return data.reverse();
+    return data;
   };
 
   return {

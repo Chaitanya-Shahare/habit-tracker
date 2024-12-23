@@ -2,14 +2,12 @@ import useHabitAnalytics from "@/hooks/useHabitAnalytics";
 import React, { useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis } from "recharts";
 
-
 interface IStatusChart {
   status: { date: string }[];
 }
 
-function StatusChart({status}: IStatusChart) {
-
-  const {getChartData} = useHabitAnalytics();
+function StatusChart({ status }: IStatusChart) {
+  const { getChartData } = useHabitAnalytics();
 
   const data = getChartData(status);
 
