@@ -40,6 +40,8 @@ const useHabits = () => {
           name: newHabit.name,
           goalPerWeek: newHabit.goalPerWeek,
           status: [],
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
         });
         console.log("Document written with ID: ", docRef);
         return docRef;
@@ -50,7 +52,7 @@ const useHabits = () => {
     [userEmail]
   );
 
-  const updateHabit= useCallback(async (id: string, habit: IHabit) => {
+  const updateHabit = useCallback(async (id: string, habit: IHabit) => {
     try {
       const docRef = doc(db, "habit", id);
 
@@ -58,6 +60,7 @@ const useHabits = () => {
         name: habit.name,
         goalPerWeek: habit.goalPerWeek,
         status: habit.status,
+        modifiedAt: Date.now(),
       });
 
       return docRef;
@@ -78,10 +81,19 @@ const useHabits = () => {
         where("userEmail", "==", userEmail)
       );
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+
+      const result = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          id: doc.id,
+          createdAt: data.createdAt,
+        };
+      });
+
+      const sortedResult = result.sort((a, b) => a.createdAt - b.createdAt);
+
+      return sortedResult;
     } catch (error) {
       console.error("Error fetching habits: ", error);
       return [];
@@ -97,12 +109,12 @@ const useHabits = () => {
     } else {
       console.log("No such document!");
     }
-  },[]);
+  }, []);
 
   const deleteHabit = async (id: string) => {
     const docRef = doc(db, "habit", id);
     await deleteDoc(docRef);
-  }
+  };
 
   return {
     getHabits,
